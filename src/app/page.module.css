@@ -8,10 +8,13 @@
   padding: 0 0.5rem;
 }
 
-.samplecell {
+.back {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  background-color: #888;
+}
+
+.block {
   width: 30px;
   height: 30px;
   background: url('~/src/assets/images/icons.png') no-repeat;
