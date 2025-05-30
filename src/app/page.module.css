@@ -8,15 +8,24 @@
   padding: 0 0.5rem;
 }
 
-.board {
+.bomMap {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   background-color: #888;
+  border: 1px solid #333;
+}
+
+/* セルを横に並べる */
+.row {
+  display: flex;
 }
 
 .cell {
   width: 30px;
   height: 30px;
-  background: url('~/src/assets/images/icons.png') no-repeat;
+  cursor: pointer;
+  background-image: url('~/src/assets/images/icons.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
   border: 1px solid #000;
 }

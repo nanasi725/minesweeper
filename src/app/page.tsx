@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import styles from './page.module.css';
 
 const hight = 9;
@@ -24,28 +23,39 @@ const BomMap: number[][] = Array.from({ length: hight }, () =>
 );
 
 let bombsPlaced = 0;
-while (bombsPlaced < Bomcount){
+while (bombsPlaced < Bomcount) {
   const randomY = Math.floor(Math.random() * hight);
   const randomX = Math.floor(Math.random() * width);
 
-  if (BomMap[randomY][randomX] === 0){
+  if (BomMap[randomY][randomX] === 0) {
     BomMap[randomY][randomX] = 1;
     bombsPlaced++;
   }
 }
 
-
-
 export default function Home() {
-  const clickHandler = (x: number, y: number): void => {
-    console.log(`Cell clicked: (${x}, ${y})`);
+  const clickHandler = (y: number, x: number): void => {
+    console.log(`Cell clicked: (${y}, ${x})`);
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.BomMap}>
-        { style={{ backgroundPosition: `${-30 * }px` }} }</div>
-      <button onClick={clickHandler}>クリック</button>
+        {BomMap.map((row, y) => (
+          <div key={`row-${y}`} className={styles.row}>
+            {row.map((cellValue, x) => (
+              <div
+                key={`cell-${y}-${x}`}
+                className={styles.cell}
+                onClick={() => clickHandler(y, x)}
+              >
+                {cellValue}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      {/* <button onClick={() => console.log('Button clicked')}>クリック（仮）</button> */}
     </div>
   );
 }
