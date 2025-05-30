@@ -31,19 +31,22 @@
 }
 
 .hidden {
-  background-color: #bbb;
+  background-color: #999;
+  background-image: none;
 }
 
 .hidden:hover {
-  background-color: #ccc;
+  background-color: #777;
+  background-image: none;
 }
 
 .revealed0 {
-  background-color: #eee;
+  background-color: #777;
+  background-image: none;
 }
 
 .revealedBomb {
-  background-position: -240px 0;
+  background-position: -300px 0;
 }
 
 .revealed1 {
@@ -81,6 +84,7 @@
 .flagged {
   background-position: -270px 0;
 }
+
 .question {
-  background-position: -300px 0;
+  background-position: -240px 0;
 }
