@@ -19,30 +19,32 @@ const directions = [
   [1, 1],
 ];
 
-const board: number[][] = Array.from({ length: hight }, () =>
+const BomMap: number[][] = Array.from({ length: hight }, () =>
   Array.from({ length: width }, () => 0),
 );
 
-export default function Home() {
-  const [board, setBoard] = useState<number[][]>([
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-  ]);
-  const [,] = useState(0);
+let bombsPlaced = 0;
+while (bombsPlaced < Bomcount){
+  const randomY = Math.floor(Math.random() * hight);
+  const randomX = Math.floor(Math.random() * width);
 
+  if (BomMap[randomY][randomX] === 0){
+    BomMap[randomY][randomX] = 1;
+    bombsPlaced++;
+  }
+}
+
+
+
+export default function Home() {
   const clickHandler = (x: number, y: number): void => {
-    //const  = structuredClone(); [] += 1;(); (( + 1) % 14);
+    console.log(`Cell clicked: (${x}, ${y})`);
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.board}>{/* style={{ backgroundPosition: `${-30 * }px` }} */}</div>
+      <div className={styles.BomMap}>
+        { style={{ backgroundPosition: `${-30 * }px` }} }</div>
       <button onClick={clickHandler}>クリック</button>
     </div>
   );
