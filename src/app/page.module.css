@@ -21,11 +21,66 @@
 }
 
 .cell {
+  box-sizing: border-box;
   width: 30px;
   height: 30px;
   cursor: pointer;
   background-image: url('~/src/assets/images/icons.png');
   background-repeat: no-repeat;
-  background-position: 0 0;
   border: 1px solid #000;
+}
+
+.hidden {
+  background-color: #bbb;
+}
+
+.hidden:hover {
+  background-color: #ccc;
+}
+
+.revealed0 {
+  background-color: #eee;
+}
+
+.revealedBomb {
+  background-position: -240px 0;
+}
+
+.revealed1 {
+  background-position: 0 0;
+}
+
+.revealed2 {
+  background-position: -30px 0;
+}
+
+.revealed3 {
+  background-position: -60px 0;
+}
+
+.revealed4 {
+  background-position: -90px 0;
+}
+
+.revealed5 {
+  background-position: -120px 0;
+}
+
+.revealed6 {
+  background-position: -150px 0;
+}
+
+.revealed7 {
+  background-position: -180px 0;
+}
+
+.revealed8 {
+  background-position: -210px 0;
+}
+
+.flagged {
+  background-position: -270px 0;
+}
+.question {
+  background-position: -300px 0;
 }
