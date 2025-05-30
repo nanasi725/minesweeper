@@ -152,7 +152,36 @@ export default function Home() {
                   cellClassName += ` ${styles.revealedBomb}`;
                 } else {
                   const adjacentBombs = calculateAdjacentBombs(y, x, bombMap, hight, width);
-                  cellClassName += ` ${styles[`revealed${adjacentBombs}`]}`;
+                  switch (adjacentBombs) {
+                    case 0:
+                      cellClassName += ` ${styles.revealed0}`;
+                      break;
+                    case 1:
+                      cellClassName += ` ${styles.revealed1}`;
+                      break;
+                    case 2:
+                      cellClassName += ` ${styles.revealed2}`;
+                      break;
+                    case 3:
+                      cellClassName += ` ${styles.revealed3}`;
+                      break;
+                    case 4:
+                      cellClassName += ` ${styles.revealed4}`;
+                      break;
+                    case 5:
+                      cellClassName += ` ${styles.revealed5}`;
+                      break;
+                    case 6:
+                      cellClassName += ` ${styles.revealed6}`;
+                      break;
+                    case 7:
+                      cellClassName += ` ${styles.revealed7}`;
+                      break;
+                    case 8:
+                      cellClassName += ` ${styles.revealed8}`;
+                      break;
+                    // default は設定しなくても良いですが、予期せぬ値の場合のスタイルがあれば設定します
+                  }
                 }
               } else {
                 cellClassName += ` ${styles.hidden}`;
