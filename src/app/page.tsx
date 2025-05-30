@@ -7,7 +7,6 @@ const hight = 9;
 const width = 9;
 const Bomcount = 10;
 
-// 8方向の相対座標
 const directions = [
   [-1, -1],
   [-1, 0],
@@ -19,7 +18,6 @@ const directions = [
   [1, 1],
 ];
 
-// 周囲の地雷の数を数えるヘルパー関数
 const calculateAdjacentBombs = (
   r: number,
   c: number,
@@ -39,15 +37,15 @@ const calculateAdjacentBombs = (
   });
   return count;
 };
+
 const floodFillRecursive = (
   r: number,
   c: number,
   currentBombMap: number[][],
-  currentRevealedMap: number[][], // このマップを直接変更します
+  currentRevealedMap: number[][],
   h: number,
   w: number,
 ): void => {
-  // 1. 盤面の範囲外、または既に開かれている、または地雷のマスなら処理を終了
   if (
     r < 0 ||
     r >= h ||
@@ -56,17 +54,10 @@ const floodFillRecursive = (
     currentRevealedMap[r][c] === 1 ||
     currentBombMap[r][c] === 1
   ) {
-    // 地雷のマスはフラッドフィルでは開かない (直接クリックされた場合のみclickHandlerで開封)
     return;
   }
-
-  // 2. セル (r, c) を開く
   currentRevealedMap[r][c] = 1;
-
-  // 3. 開いたセル (r, c) の周囲の地雷の数を計算する
   const adjacentBombs = calculateAdjacentBombs(r, c, currentBombMap, h, w);
-
-  // 4. もし周囲の地雷の数が 0 だったら、さらに周囲8方向のセルに対しても再帰的に呼び出す
   if (adjacentBombs === 0) {
     directions.forEach(([dr, dc]) => {
       floodFillRecursive(r + dr, c + dc, currentBombMap, currentRevealedMap, h, w);
@@ -81,11 +72,17 @@ export default function Home() {
   const [revealedMap, setRevealedMap] = useState<number[][]>(() =>
     Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)),
   );
+  const [gameState, setGameState] = useState<'playing' | 'gameOver' | 'win'>('playing');
+
   const clickHandler = (y: number, x: number): void => {
+    // ゲームがプレイ中でなければ何もしない (ガード処理)
+    if (gameState !== 'playing') {
+      console.log('Game is not in "playing" state. No action.');
+      return;
+    }
+
     let currentBombMap = bombMap;
     const isFirstClick = bombMap.flat().every((cell) => cell === 0);
-
-    // console.log(`Cell clicked: (row=${y}, col=${x})`);
 
     if (isFirstClick) {
       console.log('This is the first click! Preparing to generate bombs...');
@@ -106,38 +103,37 @@ export default function Home() {
       console.log('Bombs have been generated and set!');
     }
 
-    // revealedMap の「深いコピー」を作成します。このコピーが変更対象です。
     const newRevealedMap = revealedMap.map((row) => [...row]);
 
     if (newRevealedMap[y][x] === 0) {
       // まだ開いていないセルなら
-
       if (currentBombMap[y][x] === 1) {
-        // 地雷を踏んだか
+        // 地雷を踏んだ！
         console.log(`BOOM! Cell (row=${y}, col=${x}) was a mine.`);
-        // 地雷を踏んだ場合も、そのセルだけは開く (newRevealedMap を更新)
-        newRevealedMap[y][x] = 1;
-        // TODO: 本格的なゲームオーバー処理
+        setGameState('gameOver'); // ゲーム状態を更新
+
+        // 全ての地雷を開封済みにする
+        for (let r = 0; r < hight; r++) {
+          for (let c = 0; c < width; c++) {
+            if (currentBombMap[r][c] === 1) {
+              // currentBombMap を参照
+              newRevealedMap[r][c] = 1;
+            }
+          }
+        }
+        newRevealedMap[y][x] = 1; // 踏んだ地雷も確実に開く
       } else {
         // 安全なマスだった場合
-        const adjacentBombs = calculateAdjacentBombs(y, x, currentBombMap, hight, width);
-        console.log(
-          `Safe! Cell (row=${y}, col=${x}) is not a mine. Adjacent bombs: ${adjacentBombs}`,
-        );
-
-        // クリックされたマスからフラッドフィルを開始
-        // floodFillRecursive が newRevealedMap を直接変更します
+        console.log(`Cell (row=${y}, col=${x}) is safe. Attempting to reveal/flood fill...`);
         floodFillRecursive(y, x, currentBombMap, newRevealedMap, hight, width);
       }
-
-      // 全ての開封処理が終わった後、最終的な newRevealedMap で state を更新
-      setRevealedMap(newRevealedMap);
+      setRevealedMap(newRevealedMap); // 状態を一括更新
     } else {
-      // すでに開いているセルがクリックされた場合
       console.log(`Cell (row=${y}, col=${x}) is already revealed.`);
     }
   };
 
+  // return (...) のJSX部分は変更ありません
   return (
     <div className={styles.container}>
       <div className={styles.bomMap}>
@@ -146,7 +142,6 @@ export default function Home() {
             {row.map((cellValueInBombMap, x) => {
               const isRevealed = revealedMap[y][x] === 1;
               let cellClassName = styles.cell;
-
               if (isRevealed) {
                 if (cellValueInBombMap === 1) {
                   cellClassName += ` ${styles.revealedBomb}`;
@@ -180,13 +175,11 @@ export default function Home() {
                     case 8:
                       cellClassName += ` ${styles.revealed8}`;
                       break;
-                    // default は設定しなくても良いですが、予期せぬ値の場合のスタイルがあれば設定します
                   }
                 }
               } else {
                 cellClassName += ` ${styles.hidden}`;
               }
-
               return (
                 <div
                   key={`cell-${y}-${x}`}
