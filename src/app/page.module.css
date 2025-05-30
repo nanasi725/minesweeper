@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   background-color: #888;
-  border: 1px solid #333;
+  border: 5px outset #333;
 }
 
 /* セルを横に並べる */
@@ -22,12 +22,12 @@
 
 .cell {
   box-sizing: border-box;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
   background-image: url('~/src/assets/images/icons.png');
   background-repeat: no-repeat;
-  border: 1px solid #000;
+  border: 3px outset #000;
 }
 
 .hidden {
