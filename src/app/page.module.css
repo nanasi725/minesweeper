@@ -88,3 +88,29 @@
 .question {
   background-position: -240px 0;
 }
+
+.resetButton {
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.smiley {
+  width: 30px;
+  height: 30px;
+  background-image: url('~/src/assets/images/icons.png');
+  background-repeat: no-repeat;
+}
+
+.smileyPlaying {
+  background-position: -330px 0;
+}
+
+.smileyWin {
+  background-position: -360px 0;
+}
+
+.smileyLose {
+  background-position: -390px 0;
+}
