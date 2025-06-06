@@ -127,6 +127,12 @@
   border: 5px outset #f0f0f0;
 }
 
+.difficultySelector {
+  display: flex;
+  gap: 10px; /* Puts space between the buttons */
+  margin-bottom: 15px; /* Adds space below the buttons, before the header */
+}
+
 .counter {
   padding: 2px 5px;
   font-family: 'Courier New', Courier, monospace;
