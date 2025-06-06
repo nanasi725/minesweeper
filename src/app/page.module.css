@@ -114,3 +114,24 @@
 .smileyLose {
   background-position: -390px 0;
 }
+
+.header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  padding: 8px;
+  margin-bottom: 15px;
+  background-color: #c0c0c0;
+  border: 5px outset #f0f0f0;
+}
+
+.counter {
+  padding: 2px 5px;
+  font-family: 'Courier New', Courier, monospace;
+  color: red;
+  background-color: #000;
+  border: 2px inset #fff;
+}
