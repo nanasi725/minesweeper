@@ -115,6 +115,11 @@ export default function Home() {
   const [gameState, setGameState] = useState<'playing' | 'gameOver' | 'win'>('playing');
   const [time, setTime] = useState<number>(0);
 
+  // カスタム設定の入力値を保持する状態
+  const [customHeight, setCustomHeight] = useState(DIFFICULTY_LEVELS.easy.hight);
+  const [customWidth, setCustomWidth] = useState(DIFFICULTY_LEVELS.easy.width);
+  const [customBombs, setCustomBombs] = useState(DIFFICULTY_LEVELS.easy.Bomcount);
+
   // --- イベントハンドラとその他の関数 ---
 
   // ゲームをリセットする関数 (useCallbackでメモ化)
@@ -167,6 +172,21 @@ export default function Home() {
     setDifficulty(DIFFICULTY_LEVELS[level]);
   };
 
+  // カスタム設定を適用する関数
+  const handleApplyCustom = () => {
+    if (customBombs >= customHeight * customWidth) {
+      alert('地雷の数がセルの総数より多すぎます！');
+      return;
+    }
+    const newCustomDifficulty = {
+      hight: customHeight,
+      width: customWidth,
+      Bomcount: customBombs,
+    };
+    setDifficulty(newCustomDifficulty);
+    console.log('Applying custom settings:', newCustomDifficulty);
+  };
+
   // 左クリック時のハンドラ
   const clickHandler = (y: number, x: number): void => {
     if (gameState !== 'playing' || userInputMap[y][x] === 1) {
@@ -177,7 +197,6 @@ export default function Home() {
     const isFirstClick = bombMap.flat().every((cell) => cell === 0);
 
     if (isFirstClick) {
-      console.log('This is the first click! Preparing to generate bombs...');
       const newBombMap = Array.from({ length: difficulty.hight }, () =>
         Array.from({ length: difficulty.width }, () => 0),
       );
@@ -192,10 +211,10 @@ export default function Home() {
       }
       setBombMap(newBombMap);
       currentBombMap = newBombMap;
-      console.log('Bombs have been generated and set!');
     }
 
     const newRevealedMap = revealedMap.map((row) => [...row]);
+
     if (newRevealedMap[y][x] === 0) {
       if (currentBombMap[y][x] === 1) {
         setGameState('gameOver');
@@ -227,8 +246,6 @@ export default function Home() {
         }
       }
       setRevealedMap(newRevealedMap);
-    } else {
-      console.log(`Cell (row=${y}, col=${x}) is already revealed.`);
     }
   };
 
@@ -254,6 +271,34 @@ export default function Home() {
         <button onClick={() => changeDifficulty('easy')}>初級</button>
         <button onClick={() => changeDifficulty('medium')}>中級</button>
         <button onClick={() => changeDifficulty('hard')}>上級</button>
+      </div>
+
+      <div className={styles.customSettings}>
+        <label>
+          高さ:
+          <input
+            type="number"
+            value={customHeight}
+            onChange={(e) => setCustomHeight(parseInt(e.target.value, 10))}
+          />
+        </label>
+        <label>
+          幅:
+          <input
+            type="number"
+            value={customWidth}
+            onChange={(e) => setCustomWidth(parseInt(e.target.value, 10))}
+          />
+        </label>
+        <label>
+          地雷:
+          <input
+            type="number"
+            value={customBombs}
+            onChange={(e) => setCustomBombs(parseInt(e.target.value, 10))}
+          />
+        </label>
+        <button onClick={handleApplyCustom}>カスタムで開始</button>
       </div>
 
       <div className={styles.header}>

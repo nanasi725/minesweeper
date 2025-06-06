@@ -140,3 +140,14 @@
   background-color: #000;
   border: 2px inset #fff;
 }
+
+.customSettings {
+  display: flex;
+  gap: 15px; /* 各入力欄の間のスペース */
+  align-items: center;
+  margin-top: 10px;
+}
+
+.customSettings input {
+  width: 50px; /* 入力欄の幅 */
+}
