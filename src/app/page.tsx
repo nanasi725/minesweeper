@@ -1,11 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+// Reactフックをインポート
+import { useCallback, useEffect, useState } from 'react';
+// CSSモジュールをインポート
 import styles from './page.module.css';
-
-const hight = 9;
-const width = 9;
-const Bomcount = 10;
 
 // 8方向の相対座標
 const directions = [
@@ -19,7 +17,16 @@ const directions = [
   [1, 1],
 ];
 
-// ヘルパー関数群
+// 難易度設定
+const DIFFICULTY_LEVELS = {
+  easy: { hight: 9, width: 9, Bomcount: 10 },
+  medium: { hight: 16, width: 16, Bomcount: 40 },
+  hard: { hight: 16, width: 30, Bomcount: 99 },
+};
+
+// --- ヘルパー関数群 ---
+
+// 周囲の地雷の数を数える関数
 const calculateAdjacentBombs = (
   r: number,
   c: number,
@@ -39,6 +46,8 @@ const calculateAdjacentBombs = (
   });
   return count;
 };
+
+// フラッドフィル（連鎖開封）のための再帰関数
 const floodFillRecursive = (
   r: number,
   c: number,
@@ -65,6 +74,8 @@ const floodFillRecursive = (
     });
   }
 };
+
+// ゲームクリア条件を判定する関数
 const checkWinCondition = (
   currentBombMap: number[][],
   currentRevealedMap: number[][],
@@ -81,54 +92,84 @@ const checkWinCondition = (
   return true;
 };
 
+// --- メインのReactコンポーネント ---
 export default function Home() {
+  const [difficulty, setDifficulty] = useState(DIFFICULTY_LEVELS.easy);
+
   // --- 状態変数の宣言 ---
   const [bombMap, setBombMap] = useState<number[][]>(() =>
-    Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)),
+    Array.from({ length: difficulty.hight }, () =>
+      Array.from({ length: difficulty.width }, () => 0),
+    ),
   );
   const [revealedMap, setRevealedMap] = useState<number[][]>(() =>
-    Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)),
+    Array.from({ length: difficulty.hight }, () =>
+      Array.from({ length: difficulty.width }, () => 0),
+    ),
+  );
+  const [userInputMap, setUserInputMap] = useState<number[][]>(() =>
+    Array.from({ length: difficulty.hight }, () =>
+      Array.from({ length: difficulty.width }, () => 0),
+    ),
   );
   const [gameState, setGameState] = useState<'playing' | 'gameOver' | 'win'>('playing');
-  const [userInputMap, setUserInputMap] = useState<number[][]>(() =>
-    Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)),
-  );
-  const [time, setTime] = useState<number>(0); // タイマー用の状態
+  const [time, setTime] = useState<number>(0);
+
+  // --- イベントハンドラとその他の関数 ---
+
+  // ゲームをリセットする関数 (useCallbackでメモ化)
+  const resetGame = useCallback(() => {
+    console.log('Resetting the game...');
+    setBombMap(
+      Array.from({ length: difficulty.hight }, () =>
+        Array.from({ length: difficulty.width }, () => 0),
+      ),
+    );
+    setRevealedMap(
+      Array.from({ length: difficulty.hight }, () =>
+        Array.from({ length: difficulty.width }, () => 0),
+      ),
+    );
+    setUserInputMap(
+      Array.from({ length: difficulty.hight }, () =>
+        Array.from({ length: difficulty.width }, () => 0),
+      ),
+    );
+    setGameState('playing');
+    setTime(0);
+  }, [difficulty]);
+
+  // --- エフェクトフック ---
+
+  // タイマー用のuseEffect
   useEffect(() => {
     let intervalId: NodeJS.Timeout | undefined = undefined;
-
-    // ゲームがプレイ中の場合のみタイマーを動かす
+    // 最初のクリックが終わってからタイマーを開始
     if (gameState === 'playing' && !bombMap.flat().every((cell) => cell === 0)) {
-      // isFirstClick と逆の条件
       intervalId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
       }, 1000);
     }
-
-    // クリーンアップ関数
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [gameState, bombMap]); // gameState または bombMap が変化したときに再実行
+  }, [gameState, bombMap]);
 
-  // --- イベントハンドラとその他の関数 ---
-  const resetGame = () => {
-    console.log('Resetting the game...');
-    setBombMap(Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)));
-    setRevealedMap(Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)));
-    setUserInputMap(Array.from({ length: hight }, () => Array.from({ length: width }, () => 0)));
-    setGameState('playing');
-    // ★修正点3★ time もリセットします
-    setTime(0);
+  // 難易度変更時にリセットするためのuseEffect
+  useEffect(() => {
+    resetGame();
+  }, [resetGame]);
+
+  // 難易度を変更する関数
+  const changeDifficulty = (level: keyof typeof DIFFICULTY_LEVELS) => {
+    setDifficulty(DIFFICULTY_LEVELS[level]);
   };
 
+  // 左クリック時のハンドラ
   const clickHandler = (y: number, x: number): void => {
-    if (gameState !== 'playing') {
-      return;
-    }
-    if (userInputMap[y][x] === 1) {
+    if (gameState !== 'playing' || userInputMap[y][x] === 1) {
       return;
     }
 
@@ -137,13 +178,13 @@ export default function Home() {
 
     if (isFirstClick) {
       console.log('This is the first click! Preparing to generate bombs...');
-      const newBombMap = Array.from({ length: hight }, () =>
-        Array.from({ length: width }, () => 0),
+      const newBombMap = Array.from({ length: difficulty.hight }, () =>
+        Array.from({ length: difficulty.width }, () => 0),
       );
-      let bombsToPlace = Bomcount;
+      let bombsToPlace = difficulty.Bomcount;
       while (bombsToPlace > 0) {
-        const rY = Math.floor(Math.random() * hight);
-        const rX = Math.floor(Math.random() * width);
+        const rY = Math.floor(Math.random() * difficulty.hight);
+        const rX = Math.floor(Math.random() * difficulty.width);
         if (newBombMap[rY][rX] === 0 && (rY !== y || rX !== x)) {
           newBombMap[rY][rX] = 1;
           bombsToPlace--;
@@ -157,18 +198,29 @@ export default function Home() {
     const newRevealedMap = revealedMap.map((row) => [...row]);
     if (newRevealedMap[y][x] === 0) {
       if (currentBombMap[y][x] === 1) {
-        console.log(`BOOM! Cell (row=${y}, col=${x}) was a mine.`);
         setGameState('gameOver');
-        for (let r = 0; r < hight; r++) {
-          for (let c = 0; c < width; c++) {
+        for (let r = 0; r < difficulty.hight; r++) {
+          for (let c = 0; c < difficulty.width; c++) {
             if (currentBombMap[r][c] === 1) {
               newRevealedMap[r][c] = 1;
             }
           }
         }
       } else {
-        floodFillRecursive(y, x, currentBombMap, newRevealedMap, hight, width);
-        const gameWon = checkWinCondition(currentBombMap, newRevealedMap, hight, width);
+        floodFillRecursive(
+          y,
+          x,
+          currentBombMap,
+          newRevealedMap,
+          difficulty.hight,
+          difficulty.width,
+        );
+        const gameWon = checkWinCondition(
+          currentBombMap,
+          newRevealedMap,
+          difficulty.hight,
+          difficulty.width,
+        );
         if (gameWon) {
           setGameState('win');
           console.log('Congratulations! You won the game!');
@@ -180,6 +232,7 @@ export default function Home() {
     }
   };
 
+  // 右クリック時のハンドラ
   const rightClickHandler = (y: number, x: number, e: React.MouseEvent): void => {
     e.preventDefault();
     if (gameState !== 'playing' || revealedMap[y][x] === 1) {
@@ -189,14 +242,20 @@ export default function Home() {
     const nextUserInput = (newUserInputMap[y][x] + 1) % 3;
     newUserInputMap[y][x] = nextUserInput;
     setUserInputMap(newUserInputMap);
-    // console.log(`Right-clicked on cell (row=${y}, col=${x})`); // デバッグ用
   };
 
+  // 描画のための計算
   const flagCount = userInputMap.flat().filter((input) => input === 1).length;
-  const remainingBombs = Bomcount - flagCount;
+  const remainingBombs = difficulty.Bomcount - flagCount;
 
   return (
     <div className={styles.container}>
+      <div className={styles.difficultySelector}>
+        <button onClick={() => changeDifficulty('easy')}>初級</button>
+        <button onClick={() => changeDifficulty('medium')}>中級</button>
+        <button onClick={() => changeDifficulty('hard')}>上級</button>
+      </div>
+
       <div className={styles.header}>
         <div>残り地雷: {remainingBombs}</div>
         <button className={styles.resetButton} onClick={resetGame}>
@@ -212,17 +271,25 @@ export default function Home() {
         </button>
         <div>時間: {time}</div>
       </div>
-      <div className={styles.bomMap}>
+
+      <div className={styles.bomMap} style={{ width: difficulty.width * 36 }}>
         {bombMap.map((row, y) => (
           <div key={`row-${y}`} className={styles.row}>
             {row.map((cellValueInBombMap, x) => {
               const isRevealed = revealedMap[y][x] === 1;
               let cellClassName = styles.cell;
+
               if (isRevealed) {
                 if (cellValueInBombMap === 1) {
                   cellClassName += ` ${styles.revealedBomb}`;
                 } else {
-                  const adjacentBombs = calculateAdjacentBombs(y, x, bombMap, hight, width);
+                  const adjacentBombs = calculateAdjacentBombs(
+                    y,
+                    x,
+                    bombMap,
+                    difficulty.hight,
+                    difficulty.width,
+                  );
                   switch (adjacentBombs) {
                     case 0:
                       cellClassName += ` ${styles.revealed0}`;

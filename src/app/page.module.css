@@ -121,9 +121,8 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 400px;
+  max-width: 335px;
   padding: 8px;
-  margin-bottom: 15px;
   background-color: #c0c0c0;
   border: 5px outset #f0f0f0;
 }
