@@ -184,7 +184,6 @@ export default function Home() {
       Bomcount: customBombs,
     };
     setDifficulty(newCustomDifficulty);
-    console.log('Applying custom settings:', newCustomDifficulty);
   };
 
   // 左クリック時のハンドラ
@@ -302,7 +301,7 @@ export default function Home() {
       </div>
 
       <div className={styles.header}>
-        <div>残り地雷: {remainingBombs}</div>
+        <div className={styles.counter}>{String(remainingBombs).padStart(3, '0')}</div>
         <button className={styles.resetButton} onClick={resetGame}>
           <div
             className={`${styles.smiley} ${
@@ -314,7 +313,7 @@ export default function Home() {
             }`}
           />
         </button>
-        <div>時間: {time}</div>
+        <div className={styles.counter}>{String(time).padStart(3, '0')}</div>
       </div>
 
       <div className={styles.bomMap} style={{ width: difficulty.width * 36 }}>
