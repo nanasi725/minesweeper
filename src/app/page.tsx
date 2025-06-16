@@ -324,11 +324,7 @@ export default function Home() {
                 let cellClassName = styles.cell;
 
                 if (isRevealed) {
-                  // ★★★ 修正箇所 ★★★
-                  // まず、開封済み共通のスタイルを適用
                   cellClassName += ` ${styles.revealed}`;
-
-                  // その上で、中身に応じたスタイルを適用
                   if (cellValueInBombMap === 1) {
                     cellClassName += ` ${styles.revealedBomb}`;
                   } else {
@@ -339,7 +335,35 @@ export default function Home() {
                       difficulty.hight,
                       difficulty.width,
                     );
-                    cellClassName += ` ${styles[`revealed${adjacentBombs}`]}`;
+                    switch (adjacentBombs) {
+                      case 0:
+                        cellClassName += ` ${styles.revealed0}`;
+                        break;
+                      case 1:
+                        cellClassName += ` ${styles.revealed1}`;
+                        break;
+                      case 2:
+                        cellClassName += ` ${styles.revealed2}`;
+                        break;
+                      case 3:
+                        cellClassName += ` ${styles.revealed3}`;
+                        break;
+                      case 4:
+                        cellClassName += ` ${styles.revealed4}`;
+                        break;
+                      case 5:
+                        cellClassName += ` ${styles.revealed5}`;
+                        break;
+                      case 6:
+                        cellClassName += ` ${styles.revealed6}`;
+                        break;
+                      case 7:
+                        cellClassName += ` ${styles.revealed7}`;
+                        break;
+                      case 8:
+                        cellClassName += ` ${styles.revealed8}`;
+                        break;
+                    }
                   }
                 } else {
                   const userInputState = userInputMap[y][x];
