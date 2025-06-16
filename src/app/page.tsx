@@ -149,7 +149,6 @@ export default function Home() {
   // タイマー用のuseEffect
   useEffect(() => {
     let intervalId: NodeJS.Timeout | undefined = undefined;
-    // 最初のクリックが終わってからタイマーを開始
     if (gameState === 'playing' && !bombMap.flat().every((cell) => cell === 0)) {
       intervalId = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
@@ -300,91 +299,70 @@ export default function Home() {
         <button onClick={handleApplyCustom}>カスタムで開始</button>
       </div>
 
-      <div className={styles.header}>
-        <div className={styles.counter}>{String(remainingBombs).padStart(3, '0')}</div>
-        <button className={styles.resetButton} onClick={resetGame}>
-          <div
-            className={`${styles.smiley} ${
-              gameState === 'win'
-                ? styles.smileyWin
-                : gameState === 'gameOver'
-                  ? styles.smileyLose
-                  : styles.smileyPlaying
-            }`}
-          />
-        </button>
-        <div className={styles.counter}>{String(time).padStart(3, '0')}</div>
-      </div>
+      <div className={styles.boardWrapper}>
+        <div className={styles.header}>
+          <div className={styles.counter}>{String(remainingBombs).padStart(3, '0')}</div>
+          <button className={styles.resetButton} onClick={resetGame}>
+            <div
+              className={`${styles.smiley} ${
+                gameState === 'win'
+                  ? styles.smileyWin
+                  : gameState === 'gameOver'
+                    ? styles.smileyLose
+                    : styles.smileyPlaying
+              }`}
+            />
+          </button>
+          <div className={styles.counter}>{String(time).padStart(3, '0')}</div>
+        </div>
 
-      <div className={styles.bomMap} style={{ width: difficulty.width * 36 }}>
-        {bombMap.map((row, y) => (
-          <div key={`row-${y}`} className={styles.row}>
-            {row.map((cellValueInBombMap, x) => {
-              const isRevealed = revealedMap[y][x] === 1;
-              let cellClassName = styles.cell;
+        <div className={styles.bomMap} style={{ width: difficulty.width * 36 }}>
+          {bombMap.map((row, y) => (
+            <div key={`row-${y}`} className={styles.row}>
+              {row.map((cellValueInBombMap, x) => {
+                const isRevealed = revealedMap[y][x] === 1;
+                let cellClassName = styles.cell;
 
-              if (isRevealed) {
-                if (cellValueInBombMap === 1) {
-                  cellClassName += ` ${styles.revealedBomb}`;
+                if (isRevealed) {
+                  // ★★★ 修正箇所 ★★★
+                  // まず、開封済み共通のスタイルを適用
+                  cellClassName += ` ${styles.revealed}`;
+
+                  // その上で、中身に応じたスタイルを適用
+                  if (cellValueInBombMap === 1) {
+                    cellClassName += ` ${styles.revealedBomb}`;
+                  } else {
+                    const adjacentBombs = calculateAdjacentBombs(
+                      y,
+                      x,
+                      bombMap,
+                      difficulty.hight,
+                      difficulty.width,
+                    );
+                    cellClassName += ` ${styles[`revealed${adjacentBombs}`]}`;
+                  }
                 } else {
-                  const adjacentBombs = calculateAdjacentBombs(
-                    y,
-                    x,
-                    bombMap,
-                    difficulty.hight,
-                    difficulty.width,
-                  );
-                  switch (adjacentBombs) {
-                    case 0:
-                      cellClassName += ` ${styles.revealed0}`;
-                      break;
-                    case 1:
-                      cellClassName += ` ${styles.revealed1}`;
-                      break;
-                    case 2:
-                      cellClassName += ` ${styles.revealed2}`;
-                      break;
-                    case 3:
-                      cellClassName += ` ${styles.revealed3}`;
-                      break;
-                    case 4:
-                      cellClassName += ` ${styles.revealed4}`;
-                      break;
-                    case 5:
-                      cellClassName += ` ${styles.revealed5}`;
-                      break;
-                    case 6:
-                      cellClassName += ` ${styles.revealed6}`;
-                      break;
-                    case 7:
-                      cellClassName += ` ${styles.revealed7}`;
-                      break;
-                    case 8:
-                      cellClassName += ` ${styles.revealed8}`;
-                      break;
+                  const userInputState = userInputMap[y][x];
+                  if (userInputState === 1) {
+                    cellClassName += ` ${styles.flagged}`;
+                  } else if (userInputState === 2) {
+                    cellClassName += ` ${styles.question}`;
+                  } else {
+                    cellClassName += ` ${styles.hidden}`;
                   }
                 }
-              } else {
-                const userInputState = userInputMap[y][x];
-                if (userInputState === 1) {
-                  cellClassName += ` ${styles.flagged}`;
-                } else if (userInputState === 2) {
-                  cellClassName += ` ${styles.question}`;
-                } else {
-                  cellClassName += ` ${styles.hidden}`;
-                }
-              }
-              return (
-                <div
-                  key={`cell-${y}-${x}`}
-                  className={cellClassName}
-                  onClick={() => clickHandler(y, x)}
-                  onContextMenu={(e) => rightClickHandler(y, x, e)}
-                />
-              );
-            })}
-          </div>
-        ))}
+                return (
+                  <div
+                    key={`cell-${y}-${x}`}
+                    className={cellClassName}
+                    onClick={() => clickHandler(y, x)}
+                    onContextMenu={(e) => rightClickHandler(y, x, e)}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

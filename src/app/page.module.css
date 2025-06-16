@@ -6,10 +6,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
   min-height: 100vh;
-  padding: 1rem;
-  background-color: #c0c0c0;
+  padding: 0 0 5rem;
 }
 
 .difficultySelector {
@@ -34,8 +32,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  max-width: 400px; /* お好みで調整 */
   padding: 8px;
   margin-bottom: 1px;
   background-color: #c0c0c0;
@@ -73,9 +69,13 @@
   background-image: none;
 }
 
-.revealed0 {
-  background-image: none;
+.revealed {
   border: 1px solid #7b7b7b;
+}
+
+.revealed0 {
+  background-color: #c0c0c0;
+  background-image: none;
 }
 
 .revealedBomb {
@@ -165,4 +165,12 @@
   letter-spacing: 2px;
   background-color: #000;
   border: 2px inset #7b7b7b;
+}
+
+.boardWrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #c0c0c0;
+  border: 1px solid #000;
 }
